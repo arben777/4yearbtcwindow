@@ -31,31 +31,28 @@ def analyze_btc_enhanced_loan(btc_data, loan_scenario):
     btc_accumulated = 0
     total_btc_investment = 0
     
-    # Use last X months of data instead of starting from 2015
-    end_date = btc_data['date'].max()
-    start_date = end_date - pd.DateOffset(months=loan_scenario['loan_term_months'])
+    # Get the start date and generate monthly purchase dates
+    start_date = btc_data['date'].max() - pd.DateOffset(months=loan_scenario['loan_term_months'])
+    purchase_dates = pd.date_range(
+        start=start_date,
+        periods=loan_scenario['loan_term_months'],
+        freq='ME'  # Monthly frequency
+    )
     
-    # Filter data to only include the relevant time period
-    period_data = btc_data[
-        (btc_data['date'] >= start_date) & 
-        (btc_data['date'] <= end_date)
-    ]
+    # Filter data to relevant period
+    period_data = btc_data[btc_data['date'] >= start_date].copy()
     
-    # Simulate monthly BTC purchases
-    for month in range(loan_scenario['loan_term_months']):
-        month_start = start_date + pd.DateOffset(months=month)
+    # Simulate monthly purchases on specific dates
+    for purchase_date in purchase_dates:
+        # Find the closest trading day's price
+        day_price = period_data.loc[
+            (period_data['date'] - purchase_date).abs().idxmin(),
+            'avg_price'
+        ]
         
-        # Find the closest available price data after this date
-        available_prices = period_data[period_data['date'] >= month_start]
-        
-        if len(available_prices) == 0:
-            break
-            
-        month_price = available_prices['avg_price'].iloc[0]
-        
-        # Update both BTC accumulated and total investment
-        btc_purchase = loan_metrics['btc_monthly_amount'] / month_price
-        btc_accumulated += btc_purchase
+        # Calculate BTC purchased this month
+        btc_purchased = loan_metrics['btc_monthly_amount'] / day_price
+        btc_accumulated += btc_purchased
         total_btc_investment += loan_metrics['btc_monthly_amount']
     
     # Get final BTC value using the end date price
@@ -86,7 +83,7 @@ def analyze_btc_enhanced_loan(btc_data, loan_scenario):
         'net_position': final_btc_value - total_btc_investment,
         'roi_percentage': roi_percentage,
         'start_date': start_date,
-        'end_date': end_date,
+        'end_date': btc_data['date'].max(),
         'interest_cost': loan_metrics['total_payments'] - loan_scenario['principal_amount'],
         'net_interest_after_btc': (loan_metrics['total_payments'] - loan_scenario['principal_amount']) - (final_btc_value - total_btc_investment),
         'effective_apr': effective_apr,
