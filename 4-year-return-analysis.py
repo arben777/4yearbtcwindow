@@ -70,24 +70,32 @@ def analyze_btc_returns(csv_path):
     max_return_idx = np.argmax(all_returns)
     min_return_idx = np.argmin(all_returns)
     
+    # Get the corresponding end indices
+    max_end_date = all_end_dates[max_return_idx]
+    min_end_date = all_end_dates[min_return_idx]
+    
+    # Find the indices in the original dataframe
+    max_end_idx = df['date'].searchsorted(max_end_date)
+    min_end_idx = df['date'].searchsorted(min_end_date)
+    
     results = {
         'highest_return': {
             'return_pct': all_returns[max_return_idx],
             'start_date': all_start_dates[max_return_idx],
             'end_date': all_end_dates[max_return_idx],
             'start_price': df['avg_price'].iloc[max_return_idx],
-            'end_price': df['avg_price'].iloc[max_return_idx + hours_4_years],
+            'end_price': df['avg_price'].iloc[max_end_idx],
             'start_volume_btc': df['Volume BTC'].iloc[max_return_idx],
-            'end_volume_btc': df['Volume BTC'].iloc[max_return_idx + hours_4_years]
+            'end_volume_btc': df['Volume BTC'].iloc[max_end_idx]
         },
         'lowest_return': {
             'return_pct': all_returns[min_return_idx],
             'start_date': all_start_dates[min_return_idx],
             'end_date': all_end_dates[min_return_idx],
             'start_price': df['avg_price'].iloc[min_return_idx],
-            'end_price': df['avg_price'].iloc[min_return_idx + hours_4_years],
+            'end_price': df['avg_price'].iloc[min_end_idx],
             'start_volume_btc': df['Volume BTC'].iloc[min_return_idx],
-            'end_volume_btc': df['Volume BTC'].iloc[min_return_idx + hours_4_years]
+            'end_volume_btc': df['Volume BTC'].iloc[min_end_idx]
         },
         'average_return': np.mean(all_returns),
         'median_return': np.median(all_returns),
