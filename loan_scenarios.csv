@@ -1,0 +1,10 @@
+loan_type,principal_amount,traditional_apr,loan_term_months,btc_purchase_percentage
+Auto Loan,20000,5.99,36,5.0
+Auto Loan,35000,6.99,48,7.5
+Auto Loan,50000,7.99,60,10.0
+Mortgage,300000,4.99,360,2.5
+Mortgage,500000,5.49,360,5.0
+Mortgage,750000,5.99,360,7.5
+Personal Loan,10000,8.99,24,5.0
+Personal Loan,25000,9.99,36,7.5
+Personal Loan,40000,11.99,48,10.0

@@ -138,7 +138,7 @@ def print_results(results):
 
 # Usage
 if __name__ == "__main__":
-    csv_path = "/Users/arben/Downloads/Gemini_BTCUSD_1h.csv"  # Replace with your CSV file path
+    csv_path = "Gemini_BTCUSD_1h.csv" 
     try:
         results = analyze_btc_returns(csv_path)
         print_results(results)
